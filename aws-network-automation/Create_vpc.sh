@@ -33,6 +33,7 @@ echo "Attached Internet Gateway $IGW_ID to VPC $VPC_ID"
 PUBLIC_SUBNET_ID=$(aws ec2 create-subnet \
      --vpc-id $VPC_ID \
      --cidr-block 172.1.0.0/20 \
+     --availability-zone "us-east-2b" \
      --tag-specifications "ResourceType=subnet,Tags=[{Key=Name,Value="Project1-Public-Subnet"},{Key=Project,Value=$Project_Tag}]" \
      --query 'Subnet.SubnetId' --output text)
 
