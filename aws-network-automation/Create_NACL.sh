@@ -44,6 +44,15 @@ aws ec2 create-network-acl-entry \
      --ingress
 echo "Created Inbound Rule to allow SSH traffic on NACL $NACL_ID"
 
+aws ec2 create-network-acl-entry \
+ --network-acl-id $NACL_ID \
+ --rule-number 130 \
+ --protocol tcp \
+ --port-range From=1024,To=65535 \
+ --cidr-block 0.0.0.0/0 \
+ --rule-action allow \
+ --ingress
+
 # Create Outbound Rule to allow all traffic
 aws ec2 create-network-acl-entry \
      --network-acl-id $NACL_ID \
@@ -53,6 +62,16 @@ aws ec2 create-network-acl-entry \
      --rule-action allow \
      --egress
 echo "Created Outbound Rule to allow all traffic on NACL $NACL_ID"
+
+aws ec2 create-network-acl-entry \
+ --network-acl-id $NACL_ID \
+ --rule-number 110 \
+ --protocol tcp \
+ --port-range From=1024,To=65535 \
+ --cidr-block 0.0.0.0/0 \
+ --rule-action allow \
+ --egress
+
 
 # Get the Default NACL ID and Association ID for the replacement of our custom NACL
 ASSOCIATION_NACL_ID=$(aws ec2 describe-network-acls \
