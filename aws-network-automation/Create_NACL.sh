@@ -63,16 +63,6 @@ aws ec2 create-network-acl-entry \
      --egress
 echo "Created Outbound Rule to allow all traffic on NACL $NACL_ID"
 
-aws ec2 create-network-acl-entry \
- --network-acl-id $NACL_ID \
- --rule-number 110 \
- --protocol tcp \
- --port-range From=1024,To=65535 \
- --cidr-block 0.0.0.0/0 \
- --rule-action allow \
- --egress
-
-
 # Get the Default NACL ID and Association ID for the replacement of our custom NACL
 ASSOCIATION_NACL_ID=$(aws ec2 describe-network-acls \
      --filters "Name=vpc-id,Values=$VPC_ID" "Name=default,Values=true" \
