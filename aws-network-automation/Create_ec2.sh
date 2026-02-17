@@ -2,7 +2,9 @@
 #set -euo pipefail
 
 Project_Tag="Project1"
-
+VPC_ID=$(aws ec2 describe-vpcs --filters "Name=tag:Name,Values=Project1-VPC" --query "Vpcs[0].VpcId" --output text)
+PUBLIC_SUBNET_ID=$(aws ec2 describe-subnets --filters "Name=tag:Name,Values=Project1-Public-Subnet" --query "Subnets[0].SubnetId" --output text)
+SEC_PUBLIC_SUBNET_ID=$(aws ec2 describe-subnets --filters "Name=tag:Name,Values=Project1-Sec-Public-Subnet" --query "Subnets[0].SubnetId" --output text)
 # Create Security Group
 SG_ID=$(aws ec2 create-security-group --description "Web Access SG" \
     --group-name "Project1-Web-SG" \
@@ -43,38 +45,48 @@ chmod 400 Project1-Key.pem
 echo "Created Key Pair and saved to Project1-Key.pem"
 
 # Create EC2 Instance
-INSTANCE_ID=$(aws ec2 run-instances \
+INSTANCE1_ID=$(aws ec2 run-instances \
     --image-id $AMI_ID \
-    --instance-type t3 .micro \
+    --instance-type t3.micro \
     --key-name "Project1-Key" \
     --security-group-ids $SG_ID \
     --subnet-id $PUBLIC_SUBNET_ID \
     --associate-public-ip-address \
-    --user-data '#!/bin/bash
-    yum update -y
-    yum install -y httpd
-    systemctl start httpd
-    systemctl enable httpd 
-    echo "Hello from Project1 Web Server!" > /var/www/html/index.html' \
+    --user-data "$(cat <<'EOF'
+#!/bin/bash
+yum update -y
+yum install -y httpd
+systemctl start httpd
+systemctl enable httpd 
+echo "Hello from Project1 Web Server!" > /var/www/html/index.html
+EOF
+    )" \
     --query 'Instances[0].InstanceId' --output text)
 
 
-echo "Created EC2 Instance with ID: $INSTANCE_ID"
+echo "Created an EC2 Instance in the first subnet with ID: $INSTANCE1_ID"
 
-export INSTANCE_ID  
+export INSTANCE1_ID
 
-
-aws ec2 run-instances \
-    --image-id ami-0335b5183d7713fee \
+INSTANCE2_ID=$(aws ec2 run-instances \
+    --image-id $AMI_ID \
     --instance-type t3.micro \
     --key-name "Project1-Key" \
-    --security-group-ids sg-0c2463498f53c5215 \
-    --subnet-id subnet-0b9dea6efca64493c \
+    --security-group-ids $SG_ID \
+    --subnet-id $SEC_PUBLIC_SUBNET_ID \
     --associate-public-ip-address \
-    --user-data '#!/bin/bash
-    yum update -y
-    yum install -y httpd
-    systemctl start httpd
-    systemctl enable httpd 
-    echo "Hello from Project1 Web Server!" > /var/www/html/index.html' \
-    --query 'Instances[0].InstanceId' --output text
+    --user-data "$(cat <<'EOF'
+#!/bin/bash
+yum update -y
+yum install -y httpd
+systemctl start httpd
+systemctl enable httpd 
+echo "Hello from Project1 Web Server!" > /var/www/html/index.html
+EOF
+    )" \
+    --query 'Instances[0].InstanceId' --output text)
+
+
+echo "Created a second EC2 Instance in the second subnet with ID: $INSTANCE2_ID"
+
+export INSTANCE2_ID

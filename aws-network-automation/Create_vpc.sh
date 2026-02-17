@@ -80,5 +80,8 @@ PRIVATE_RT_ID=$(aws ec2 create-route-table \
 
 echo "Created Private Route Table with ID: $PRIVATE_RT_ID"
 
+aws ec2 associate-route-table --route-table-id $PRIVATE_RT_ID --subnet-id $PRIVATE_SUBNET_ID
+echo "Associated Private Route Table $PRIVATE_RT_ID with Subnet $PRIVATE_SUBNET_ID"
+
 export PRIVATE_RT_ID
 export Project_Tag

@@ -19,3 +19,15 @@ SEC_PUBLIC_SUBNET_ID=$(aws ec2 create-subnet \
 
 echo "Created Secondary Public Subnet with ID: $SEC_PUBLIC_SUBNET_ID"
 export SEC_PUBLIC_SUBNET_ID
+
+# Retrieve the VPC ID for the existing VPC in case the environment variables are not set
+VPC_ID=$(aws ec2 describe-vpcs --filters "Name=tag:Name,Values=Project1-VPC" --query 'Vpcs[0].VpcId' --output text)
+
+# Getting the Public Route Table ID
+PUBLIC_RT_ID=$(aws ec2 describe-route-tables --filters "Name=vpc-id,Values=$VPC_ID" "Name=tag:Name,Values=Project1-Public-RT" --query RouteTables[0].RouteTableId --output text)
+
+
+# Associate the new subnet with the public route table
+aws ec2 associate-route-table --route-table-id $PUBLIC_RT_ID --subnet-id $SEC_PUBLIC_SUBNET_ID
+
+
