@@ -4,7 +4,7 @@
 Project_Tag="Project1"
 VPC_ID=$(aws ec2 describe-vpcs --filters "Name=tag:Name,Values=Project1-VPC" --query "Vpcs[0].VpcId" --output text)
 PUBLIC_SUBNET_ID=$(aws ec2 describe-subnets --filters "Name=tag:Name,Values=Project1-Public-Subnet" --query "Subnets[0].SubnetId" --output text)
-SEC_PUBLIC_SUBNET_ID=$(aws ec2 describe-subnets --filters "Name=tag:Name,Values=Project1-Sec-Public-Subnet" --query "Subnets[0].SubnetId" --output text)
+SEC_PUBLIC_SUBNET_ID=$(aws ec2 describe-subnets --filters "Name=tag:Name,Values=Project1-Public-Subnet-2" --query "Subnets[0].SubnetId" --output text)
 # Create Security Group
 SG_ID=$(aws ec2 create-security-group --description "Web Access SG" \
     --group-name "Project1-Web-SG" \
