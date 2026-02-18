@@ -18,3 +18,15 @@ Added outbound rule allowing TCP 1024-65535.
 
 Result:
 Instance gained internet access and cloud-init succeeded.
+
+### Issue: NAT Gateway Route Creation Failed
+
+Root Cause:
+Route was created immediately after NAT creation while NAT was still in pending state.
+
+Resolution:
+Used AWS CLI waiter (aws ec2 wait nat-gateway-available) to ensure NAT reached available state before creating route.
+
+Lesson:
+Cloud resources are provisioned asynchronously. Always wait for dependent resource states before chaining operations.
+
