@@ -5,6 +5,8 @@ Project_Tag="Project1"
 VPC_ID=$(aws ec2 describe-vpcs --filters "Name=tag:Name,Values=Project1-VPC" --query "Vpcs[0].VpcId" --output text)
 PUBLIC_SUBNET_ID=$(aws ec2 describe-subnets --filters "Name=tag:Name,Values=Project1-Public-Subnet" --query "Subnets[0].SubnetId" --output text)
 SEC_PUBLIC_SUBNET_ID=$(aws ec2 describe-subnets --filters "Name=tag:Name,Values=Project1-Public-Subnet-2" --query "Subnets[0].SubnetId" --output text)
+PRIVATE_SUBNET_ID=$(aws ec2 describe-subnets --filters "Name=tag:Name,Values=Project1-Private-Subnet" --query 'Subnets[0].SubnetId' --output text)
+
 # Create Security Group
 SG_ID=$(aws ec2 create-security-group --description "Web Access SG" \
     --group-name "Project1-Web-SG" \
@@ -51,6 +53,7 @@ INSTANCE1_ID=$(aws ec2 run-instances \
     --key-name "Project1-Key" \
     --security-group-ids $SG_ID \
     --subnet-id $PUBLIC_SUBNET_ID \
+    --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=Project1-Public-Instance-1}]" \
     --associate-public-ip-address \
     --user-data "$(cat <<'EOF'
 #!/bin/bash
@@ -74,6 +77,7 @@ INSTANCE2_ID=$(aws ec2 run-instances \
     --key-name "Project1-Key" \
     --security-group-ids $SG_ID \
     --subnet-id $SEC_PUBLIC_SUBNET_ID \
+    --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=Project1-Public-Instance-2}]" \
     --associate-public-ip-address \
     --user-data "$(cat <<'EOF'
 #!/bin/bash
@@ -90,3 +94,18 @@ EOF
 echo "Created a second EC2 Instance in the second subnet with ID: $INSTANCE2_ID"
 
 export INSTANCE2_ID
+
+# Create a private EC2 instance in the private subnet
+PRIVATE_INS_ID=$(aws ec2 run-instances \
+  --image-id $AMI_ID \
+  --instance-type t3.micro \
+  --key-name "Project1-Key" \
+  --security-group-ids $SG_ID \
+  --subnet-id $PRIVATE_SUBNET_ID \
+  --no-associate-public-ip-address \
+  --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=Project1-Private-Instance}]" \
+  --query 'Instances[0].InstanceId' --output text
+)
+
+echo "Created a private EC2 Instance in the private subnet with ID: $PRIVATE_INS_ID"
+export PRIVATE_INS_ID
