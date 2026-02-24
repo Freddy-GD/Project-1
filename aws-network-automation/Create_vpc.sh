@@ -47,6 +47,7 @@ echo "Enabled auto-assign public IP for subnet $PUBLIC_SUBNET_ID"
 PRIVATE_SUBNET_ID=$(aws ec2 create-subnet \
      --vpc-id $VPC_ID \
      --cidr-block 172.1.16.0/20 \
+     --availability-zone "us-east-2b" \
      --tag-specifications "ResourceType=subnet,Tags=[{Key=Name,Value="Project1-Private-Subnet"},{Key=Project,Value=$Project_Tag}]" \
      --query 'Subnet.SubnetId' --output text)
 

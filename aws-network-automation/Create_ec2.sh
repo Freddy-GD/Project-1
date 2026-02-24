@@ -6,35 +6,7 @@ VPC_ID=$(aws ec2 describe-vpcs --filters "Name=tag:Name,Values=Project1-VPC" --q
 PUBLIC_SUBNET_ID=$(aws ec2 describe-subnets --filters "Name=tag:Name,Values=Project1-Public-Subnet" --query "Subnets[0].SubnetId" --output text)
 SEC_PUBLIC_SUBNET_ID=$(aws ec2 describe-subnets --filters "Name=tag:Name,Values=Project1-Public-Subnet-2" --query "Subnets[0].SubnetId" --output text)
 PRIVATE_SUBNET_ID=$(aws ec2 describe-subnets --filters "Name=tag:Name,Values=Project1-Private-Subnet" --query 'Subnets[0].SubnetId' --output text)
-
-# Create Security Group
-SG_ID=$(aws ec2 create-security-group --description "Web Access SG" \
-    --group-name "Project1-Web-SG" \
-    --vpc-id $VPC_ID \
-    --tag-specifications "ResourceType=security-group,Tags=[{Key=Name,Value="Project1-Web-SG"},{Key=Project,Value=$Project_Tag}]" \
-    --query GroupId --output text)
-
-echo "Created Security Group with ID: $SG_ID"
-export SG_ID
-
-# Create Inbound Rule to allow HTTP traffic
-aws ec2 authorize-security-group-ingress \
-    --group-id $SG_ID \
-    --protocol tcp \
-    --port 80 \
-    --cidr 0.0.0.0/0 \
-    --output text
-
-echo "inbound created"
-# Create Inbound Rule to allow SSH traffic
-aws ec2 authorize-security-group-ingress \
-    --group-id $SG_ID \
-    --protocol tcp \
-    --port 22 \
-    --cidr 0.0.0.0/0 \
-    --output text
-
-echo "Created Inbound Rules to allow HTTP and SSH traffic on Security Group $SG_ID"
+SG_ID=$(aws ec2 describe-security-groups --filters "Name=tag:Name,Values=Project1-Web-SG" --query 'SecurityGroups[0].GroupId' --output text)
 
 # Get the Instance ID of the EC2 instance
 AMI_ID=$(aws ec2 describe-images --owners amazon --filters "Name=name,Values=amzn2-ami-hvm-*-x86_64-gp2" --query "Images[0].ImageId" --output text)
