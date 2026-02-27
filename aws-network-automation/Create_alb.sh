@@ -6,23 +6,23 @@ VPC_ID=$(aws ec2 describe-vpcs --filters "Name=tag:Name,Values=Project1-VPC" --q
 
 # Retrieve instances ids to register with the target group
 Instance1_ID=$(aws ec2 describe-instances \
-  --filters "Name=tag:Name,Values=Project1-Public-Instance-1" \
+  --filters "Name=tag:Name,Values=Project1-Private-Instance-1" \
   --query 'Reservations[0].Instances[0].InstanceId' \
   --output text)
 
 Instance2_ID=$(aws ec2 describe-instances \
-  --filters "Name=tag:Name,Values=Project1-Public-Instance-2" \
+  --filters "Name=tag:Name,Values=Project1-Private-Instance-2" \
   --query 'Reservations[0].Instances[0].InstanceId' \
   --output text)
 
 # Retrieve the Public Subnets IDs for the ALB
-PUBLIC_SUBNET_ID=$(aws ec2 describe-subnets \
-  --filters "Name=tag:Name,Values=Project1-Public-Subnet" \
+Private_SUBNET_ID=$(aws ec2 describe-subnets \
+  --filters "Name=tag:Name,Values=Project1-Private-Subnet" \
   --query 'Subnets[0].SubnetId' \
   --output text)
 
-SEC_PUBLIC_SUBNET_ID=$(aws ec2 describe-subnets \
-  --filters "Name=tag:Name,Values=Project1-Public-Subnet-2" \
+SEC_PRIVATE_SUBNET_ID=$(aws ec2 describe-subnets \
+  --filters "Name=tag:Name,Values=Project1-Private-Subnet-2" \
   --query 'Subnets[0].SubnetId' \
   --output text)
 
@@ -55,7 +55,7 @@ SG_ALB_ID=$(aws ec2 create-security-group --description "ALB SG" \
     --group-name "Project1-ALB-SG" \
     --vpc-id $VPC_ID \
     --tag-specifications "ResourceType=security-group,Tags=[{Key=Name,Value="Project1-ALB-SG"}]" \
-    --query SecurityGroups[0].GroupId \
+    --query GroupId \
     --output text)
 echo "Created Security Group for ALB with ID: $SG_ALB_ID"
 export SG_ALB_ID
@@ -63,7 +63,7 @@ export SG_ALB_ID
 
 LB_ARN=$(aws elbv2 create-load-balancer \
     --name "Project1-ALB" \
-    --subnets $PUBLIC_SUBNET_ID $SEC_PUBLIC_SUBNET_ID \
+    --subnets $Private_SUBNET_ID $SEC_PRIVATE_SUBNET_ID \
     --security-groups $SG_ALB_ID \
     --query 'LoadBalancers[0].LoadBalancerArn' \
     --output text)
