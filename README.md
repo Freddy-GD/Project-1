@@ -18,7 +18,7 @@ This project demonstrates a production-grade AWS network architecture deployed a
 
 ## Architecture Diagram
 
-
+![image alt](https://github.com/Freddy-GD/Project-1/blob/7f5b5e88e04978e5b5f4a181fdb4a6af83a40f23/image.png)
 *Figure 1: Multi-AZ AWS architecture showing public and private subnets, Bastion host, NAT Gateway, and Internet-facing ALB.*
 
 ---
