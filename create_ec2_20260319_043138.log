@@ -1,0 +1,21 @@
++++ date
+++ echo '===== SCRIPT STARTED at Thu Mar 19 04:31:38 UTC 2026 ====='
+===== SCRIPT STARTED at Thu Mar 19 04:31:38 UTC 2026 =====
+++ Project_Tag=Project1
++++ aws ec2 describe-vpcs --filters Name=tag:Name,Values=Project1-VPC --query 'Vpcs[0].VpcId' --output text
+++ VPC_ID=vpc-0b36e937f9fc034ea
++++ aws ec2 describe-subnets --filters Name=tag:Name,Values=Project1-Public-Subnet --query 'Subnets[0].SubnetId' --output text
+++ PUBLIC_SUBNET_ID=subnet-0527fa5498d8a4e6b
++++ aws ec2 describe-subnets --filters Name=tag:Name,Values=Project1-Private-Subnet --query 'Subnets[0].SubnetId' --output text
+++ First_Private_Subnet=subnet-09d105036b4709114
++++ aws ec2 describe-subnets --filters Name=tag:Name,Values=Project1-Private-Subnet-2 --query 'Subnets[0].SubnetId' --output text
+++ Second_Private_Subnet=subnet-00743bb2647b9789c
++++ aws ec2 describe-security-groups --filters Name=tag:Name,Values=Project1-Web-SG --query 'SecurityGroups[0].GroupId' --output text
+++ SG_ID=sg-007b45eca4e31f64a
++++ aws ec2 describe-security-groups --filters Name=tag:Name,Values=Project1-Bashion-SG --query 'SecurityGroups[0].GroupId' --output text
+++ SG_Bashion_ID=sg-05c218beb8f9db8b5
++++ aws ec2 describe-images --owners amazon --filters 'Name=name,Values=amzn2-ami-hvm-*-x86_64-gp2' --query 'sort_by(Images, &CreationDate)[-1].ImageId' --output text
+++ AMI_ID=ami-040855b0715ee6f0b
+++ echo 'Using AMI ID: ami-040855b0715ee6f0b for EC2 instance creation'
+Using AMI ID: ami-040855b0715ee6f0b for EC2 instance creation
+bash: ./aws-network-automation/Create_ec2.sh: line 139: syntax error: unexpected end of file

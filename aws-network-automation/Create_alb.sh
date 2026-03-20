@@ -16,13 +16,13 @@ Instance2_ID=$(aws ec2 describe-instances \
   --output text)
 
 # Retrieve the Public Subnets IDs for the ALB
-Private_SUBNET_ID=$(aws ec2 describe-subnets \
-  --filters "Name=tag:Name,Values=Project1-Private-Subnet" \
+Public_SUBNET_ID=$(aws ec2 describe-subnets \
+  --filters "Name=tag:Name,Values=Project1-Public-Subnet" \
   --query 'Subnets[0].SubnetId' \
   --output text)
 
-SEC_PRIVATE_SUBNET_ID=$(aws ec2 describe-subnets \
-  --filters "Name=tag:Name,Values=Project1-Private-Subnet-2" \
+SEC_PUBLIC_SUBNET_ID=$(aws ec2 describe-subnets \
+  --filters "Name=tag:Name,Values=Project1-Public-Subnet-2" \
   --query 'Subnets[0].SubnetId' \
   --output text)
 
@@ -63,8 +63,9 @@ export SG_ALB_ID
 
 LB_ARN=$(aws elbv2 create-load-balancer \
     --name "Project1-ALB" \
-    --subnets $Private_SUBNET_ID $SEC_PRIVATE_SUBNET_ID \
+    --subnets $Public_SUBNET_ID $SEC_PUBLIC_SUBNET_ID \
     --security-groups $SG_ALB_ID \
+    --scheme internet-facing \
     --query 'LoadBalancers[0].LoadBalancerArn' \
     --output text)
 

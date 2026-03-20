@@ -1,0 +1,550 @@
++++ date
+++ echo '===== SCRIPT STARTED at Thu Mar 19 04:36:25 UTC 2026 ====='
+===== SCRIPT STARTED at Thu Mar 19 04:36:25 UTC 2026 =====
+++ Project_Tag=Project1
++++ aws ec2 describe-vpcs --filters Name=tag:Name,Values=Project1-VPC --query 'Vpcs[0].VpcId' --output text
+++ VPC_ID=vpc-0b36e937f9fc034ea
++++ aws ec2 describe-subnets --filters Name=tag:Name,Values=Project1-Public-Subnet --query 'Subnets[0].SubnetId' --output text
+++ PUBLIC_SUBNET_ID=subnet-0527fa5498d8a4e6b
++++ aws ec2 describe-subnets --filters Name=tag:Name,Values=Project1-Private-Subnet --query 'Subnets[0].SubnetId' --output text
+++ First_Private_Subnet=subnet-09d105036b4709114
++++ aws ec2 describe-subnets --filters Name=tag:Name,Values=Project1-Private-Subnet-2 --query 'Subnets[0].SubnetId' --output text
+++ Second_Private_Subnet=subnet-00743bb2647b9789c
++++ aws ec2 describe-security-groups --filters Name=tag:Name,Values=Project1-Web-SG --query 'SecurityGroups[0].GroupId' --output text
+++ SG_ID=sg-007b45eca4e31f64a
++++ aws ec2 describe-security-groups --filters Name=tag:Name,Values=Project1-Bashion-SG --query 'SecurityGroups[0].GroupId' --output text
+++ SG_Bashion_ID=sg-05c218beb8f9db8b5
++++ aws ec2 describe-images --owners amazon --filters 'Name=name,Values=amzn2-ami-hvm-*-x86_64-gp2' --query 'sort_by(Images, &CreationDate)[-1].ImageId' --output text
+++ AMI_ID=ami-040855b0715ee6f0b
+++ echo 'Using AMI ID: ami-040855b0715ee6f0b for EC2 instance creation'
+Using AMI ID: ami-040855b0715ee6f0b for EC2 instance creation
+++ '[' '!' -f Project1-Key.pem ']'
+++ aws ec2 create-key-pair --key-name Project1-Key --query KeyMaterial --output text
+++ chmod 400 Project1-Key.pem
+++ echo 'Created Key Pair and saved to Project1-Key.pem'
+Created Key Pair and saved to Project1-Key.pem
+++++ cat
++++ aws ec2 run-instances --image-id ami-040855b0715ee6f0b --instance-type t3.micro --key-name Project1-Key --security-group-ids sg-05c218beb8f9db8b5 --subnet-id subnet-0527fa5498d8a4e6b --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=Project1-Bashion-Instance-1}]' --associate-public-ip-address --user-data '#!/bin/bash
+yum update -y
+yum install -y httpd
+systemctl start httpd
+systemctl enable httpd 
+echo "Hello from Project1 Web Server!" > /var/www/html/index.html' --query 'Instances[0].InstanceId' --output text
+++ INSTANCE1_ID=i-047cc1bdbc9310d4a
+++ echo 'Created an EC2 Bashion Instance in the first subnet with ID: i-047cc1bdbc9310d4a'
+Created an EC2 Bashion Instance in the first subnet with ID: i-047cc1bdbc9310d4a
+++++ cat
++++ aws ec2 run-instances --image-id ami-040855b0715ee6f0b --instance-type t3.micro --key-name Project1-Key --security-group-ids sg-007b45eca4e31f64a --subnet-id subnet-09d105036b4709114 --no-associate-public-ip-address --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=Project1-Private-Instance-1}]' --user-data '#!/bin/bash
+yum update -y
+yum install -y httpd
+systemctl start httpd
+systemctl enable httpd 
+echo "Hello from Project1 Web Server!Subnet A" > /var/www/html/index.html' --query 'Instances[0].InstanceId' --output text
+++ PRIVATE_INS1_ID=i-05272683a247a5bba
+++ echo 'Created a private EC2 Instance in the private subnet with ID: i-05272683a247a5bba'
+Created a private EC2 Instance in the private subnet with ID: i-05272683a247a5bba
+++ export PRIVATE_INS1_ID
+++++ cat
++++ aws ec2 run-instances --image-id ami-040855b0715ee6f0b --instance-type t3.micro --key-name Project1-Key --security-group-ids sg-007b45eca4e31f64a --subnet-id subnet-00743bb2647b9789c --no-associate-public-ip-address --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=Project1-Private-Instance-2}]' --user-data '#!/bin/bash
+yum update -y
+yum install -y httpd
+systemctl start httpd
+systemctl enable httpd 
+echo "Hello from Project1 Web Server!Subnet B" > /var/www/html/index.html' --query 'Instances[0].InstanceId' --output text
+++ PRIVATE_INS2_ID=i-0aa15c1c36778877e
+++ echo 'Created a private EC2 Instance in the private subnet with ID: i-0aa15c1c36778877e'
+Created a private EC2 Instance in the private subnet with ID: i-0aa15c1c36778877e
+++ export PRIVATE_INS2_ID
++++ __vsc_preexec_only ./aws-network-automation/Create_ec2.sh
++++ '[' 1 = 0 ']'
+++ __vsc_prompt_cmd
+++ __vsc_status=0
+++ __vsc_precmd
+++ __vsc_command_complete 0
+++ [[ -z 1 ]]
+++ '[' '. ./aws-network-automation/Create_ec2.sh' = '' ']'
+++ builtin printf '\e]633;D;%s\a' 0
+]633;D;0++ __vsc_update_cwd
+++ '[' 0 = 1 ']'
+++ __vsc_cwd=/workspaces/Project-1
++++ __vsc_escape_value /workspaces/Project-1
++++ '[' 21 -ge 2000 ']'
++++ builtin local -r LC_ALL=C
++++ builtin local -r str=/workspaces/Project-1
++++ builtin local -ir len=21
++++ builtin local -i i
++++ builtin local -i val
++++ builtin local byte
++++ builtin local token
++++ builtin local out=
++++ (( i=0 ))
++++ (( i < 21 ))
++++ byte=/
++++ builtin printf -v val %d ''\''/'
++++ ((  val < 31  ))
++++ ((  val == 92  ))
++++ ((  val == 59  ))
++++ token=/
++++ out+=/
++++ (( ++i  ))
++++ (( i < 21 ))
++++ byte=w
++++ builtin printf -v val %d ''\''w'
++++ ((  val < 31  ))
++++ ((  val == 92  ))
++++ ((  val == 59  ))
++++ token=w
++++ out+=w
++++ (( ++i  ))
++++ (( i < 21 ))
++++ byte=o
++++ builtin printf -v val %d ''\''o'
++++ ((  val < 31  ))
++++ ((  val == 92  ))
++++ ((  val == 59  ))
++++ token=o
++++ out+=o
++++ (( ++i  ))
++++ (( i < 21 ))
++++ byte=r
++++ builtin printf -v val %d ''\''r'
++++ ((  val < 31  ))
++++ ((  val == 92  ))
++++ ((  val == 59  ))
++++ token=r
++++ out+=r
++++ (( ++i  ))
++++ (( i < 21 ))
++++ byte=k
++++ builtin printf -v val %d ''\''k'
++++ ((  val < 31  ))
++++ ((  val == 92  ))
++++ ((  val == 59  ))
++++ token=k
++++ out+=k
++++ (( ++i  ))
++++ (( i < 21 ))
++++ byte=s
++++ builtin printf -v val %d ''\''s'
++++ ((  val < 31  ))
++++ ((  val == 92  ))
++++ ((  val == 59  ))
++++ token=s
++++ out+=s
++++ (( ++i  ))
++++ (( i < 21 ))
++++ byte=p
++++ builtin printf -v val %d ''\''p'
++++ ((  val < 31  ))
++++ ((  val == 92  ))
++++ ((  val == 59  ))
++++ token=p
++++ out+=p
++++ (( ++i  ))
++++ (( i < 21 ))
++++ byte=a
++++ builtin printf -v val %d ''\''a'
++++ ((  val < 31  ))
++++ ((  val == 92  ))
++++ ((  val == 59  ))
++++ token=a
++++ out+=a
++++ (( ++i  ))
++++ (( i < 21 ))
++++ byte=c
++++ builtin printf -v val %d ''\''c'
++++ ((  val < 31  ))
++++ ((  val == 92  ))
++++ ((  val == 59  ))
++++ token=c
++++ out+=c
++++ (( ++i  ))
++++ (( i < 21 ))
++++ byte=e
++++ builtin printf -v val %d ''\''e'
++++ ((  val < 31  ))
++++ ((  val == 92  ))
++++ ((  val == 59  ))
++++ token=e
++++ out+=e
++++ (( ++i  ))
++++ (( i < 21 ))
++++ byte=s
++++ builtin printf -v val %d ''\''s'
++++ ((  val < 31  ))
++++ ((  val == 92  ))
++++ ((  val == 59  ))
++++ token=s
++++ out+=s
++++ (( ++i  ))
++++ (( i < 21 ))
++++ byte=/
++++ builtin printf -v val %d ''\''/'
++++ ((  val < 31  ))
++++ ((  val == 92  ))
++++ ((  val == 59  ))
++++ token=/
++++ out+=/
++++ (( ++i  ))
++++ (( i < 21 ))
++++ byte=P
++++ builtin printf -v val %d ''\''P'
++++ ((  val < 31  ))
++++ ((  val == 92  ))
++++ ((  val == 59  ))
++++ token=P
++++ out+=P
++++ (( ++i  ))
++++ (( i < 21 ))
++++ byte=r
++++ builtin printf -v val %d ''\''r'
++++ ((  val < 31  ))
++++ ((  val == 92  ))
++++ ((  val == 59  ))
++++ token=r
++++ out+=r
++++ (( ++i  ))
++++ (( i < 21 ))
++++ byte=o
++++ builtin printf -v val %d ''\''o'
++++ ((  val < 31  ))
++++ ((  val == 92  ))
++++ ((  val == 59  ))
++++ token=o
++++ out+=o
++++ (( ++i  ))
++++ (( i < 21 ))
++++ byte=j
++++ builtin printf -v val %d ''\''j'
++++ ((  val < 31  ))
++++ ((  val == 92  ))
++++ ((  val == 59  ))
++++ token=j
++++ out+=j
++++ (( ++i  ))
++++ (( i < 21 ))
++++ byte=e
++++ builtin printf -v val %d ''\''e'
++++ ((  val < 31  ))
++++ ((  val == 92  ))
++++ ((  val == 59  ))
++++ token=e
++++ out+=e
++++ (( ++i  ))
++++ (( i < 21 ))
++++ byte=c
++++ builtin printf -v val %d ''\''c'
++++ ((  val < 31  ))
++++ ((  val == 92  ))
++++ ((  val == 59  ))
++++ token=c
++++ out+=c
++++ (( ++i  ))
++++ (( i < 21 ))
++++ byte=t
++++ builtin printf -v val %d ''\''t'
++++ ((  val < 31  ))
++++ ((  val == 92  ))
++++ ((  val == 59  ))
++++ token=t
++++ out+=t
++++ (( ++i  ))
++++ (( i < 21 ))
++++ byte=-
++++ builtin printf -v val %d ''\''-'
++++ ((  val < 31  ))
++++ ((  val == 92  ))
++++ ((  val == 59  ))
++++ token=-
++++ out+=-
++++ (( ++i  ))
++++ (( i < 21 ))
++++ byte=1
++++ builtin printf -v val %d ''\''1'
++++ ((  val < 31  ))
++++ ((  val == 92  ))
++++ ((  val == 59  ))
++++ token=1
++++ out+=1
++++ (( ++i  ))
++++ (( i < 21 ))
++++ builtin printf '%s\n' /workspaces/Project-1
+++ builtin printf '\e]633;P;Cwd=%s\a' /workspaces/Project-1
+]633;P;Cwd=/workspaces/Project-1++ __vsc_current_command=
+++ '[' 1 = 0 ']'
+++ __vsc_first_prompt=1
+++ __vsc_update_prompt
+++ '[' 1 = 1 ']'
+++ [[ \[]633;A\]`export XIT=$? \
+        && [ ! -z "${GITHUB_USER:-}" ] && echo -n "\[\033[0;32m\]@${GITHUB_USER:-} " || echo -n "\[\033[0;32m\]\u " \
+        && [ "$XIT" -ne "0" ] && echo -n "\[\033[1;31m\]➜" || echo -n "\[\033[0m\]➜"` \[\033[1;34m\]\w `\
+        if [ "$(git config --get devcontainers-theme.hide-status 2>/dev/null)" != 1 ] && [ "$(git config --get codespaces-theme.hide-status 2>/dev/null)" != 1 ]; then \
+            export BRANCH="$(git --no-optional-locks symbolic-ref --short HEAD 2>/dev/null || git --no-optional-locks rev-parse --short HEAD 2>/dev/null)"; \
+            if [ "${BRANCH:-}" != "" ]; then \
+                echo -n "\[\033[0;36m\](\[\033[1;31m\]${BRANCH:-}" \
+                && if [ "$(git config --get devcontainers-theme.show-dirty 2>/dev/null)" = 1 ] && \
+                    git --no-optional-locks ls-files --error-unmatch -m --directory --no-empty-directory -o --exclude-standard ":/*" > /dev/null 2>&1; then \
+                        echo -n " \[\033[1;33m\]✗"; \
+                fi \
+                && echo -n "\[\033[0;36m\]) "; \
+            fi; \
+        fi`\[\033[0m\]$ \[]633;B\] == '' ]]
+++ [[ \[]633;A\]`export XIT=$? \
+        && [ ! -z "${GITHUB_USER:-}" ] && echo -n "\[\033[0;32m\]@${GITHUB_USER:-} " || echo -n "\[\033[0;32m\]\u " \
+        && [ "$XIT" -ne "0" ] && echo -n "\[\033[1;31m\]➜" || echo -n "\[\033[0m\]➜"` \[\033[1;34m\]\w `\
+        if [ "$(git config --get devcontainers-theme.hide-status 2>/dev/null)" != 1 ] && [ "$(git config --get codespaces-theme.hide-status 2>/dev/null)" != 1 ]; then \
+            export BRANCH="$(git --no-optional-locks symbolic-ref --short HEAD 2>/dev/null || git --no-optional-locks rev-parse --short HEAD 2>/dev/null)"; \
+            if [ "${BRANCH:-}" != "" ]; then \
+                echo -n "\[\033[0;36m\](\[\033[1;31m\]${BRANCH:-}" \
+                && if [ "$(git config --get devcontainers-theme.show-dirty 2>/dev/null)" = 1 ] && \
+                    git --no-optional-locks ls-files --error-unmatch -m --directory --no-empty-directory -o --exclude-standard ":/*" > /dev/null 2>&1; then \
+                        echo -n " \[\033[1;33m\]✗"; \
+                fi \
+                && echo -n "\[\033[0;36m\]) "; \
+            fi; \
+        fi`\[\033[0m\]$ \[]633;B\] != \\\[\\]\6\3\3\;\A\\\\]\`\e\x\p\o\r\t\ \X\I\T\=\$\?\ \\\
+\ \ \ \ \ \ \ \ \&\&\ \[\ \!\ \-\z\ \"\$\{\G\I\T\H\U\B\_\U\S\E\R\:\-\}\"\ \]\ \&\&\ \e\c\h\o\ \-\n\ \"\\\[\\\0\3\3\[\0\;\3\2\m\\\]\@\$\{\G\I\T\H\U\B\_\U\S\E\R\:\-\}\ \"\ \|\|\ \e\c\h\o\ \-\n\ \"\\\[\\\0\3\3\[\0\;\3\2\m\\\]\\\u\ \"\ \\\
+\ \ \ \ \ \ \ \ \&\&\ \[\ \"\$\X\I\T\"\ \-\n\e\ \"\0\"\ \]\ \&\&\ \e\c\h\o\ \-\n\ \"\\\[\\\0\3\3\[\1\;\3\1\m\\\]\➜\"\ \|\|\ \e\c\h\o\ \-\n\ \"\\\[\\\0\3\3\[\0\m\\\]\➜\"\`\ \\\[\\\0\3\3\[\1\;\3\4\m\\\]\\\w\ \`\\\
+\ \ \ \ \ \ \ \ \i\f\ \[\ \"\$\(\g\i\t\ \c\o\n\f\i\g\ \-\-\g\e\t\ \d\e\v\c\o\n\t\a\i\n\e\r\s\-\t\h\e\m\e\.\h\i\d\e\-\s\t\a\t\u\s\ \2\>\/\d\e\v\/\n\u\l\l\)\"\ \!\=\ \1\ \]\ \&\&\ \[\ \"\$\(\g\i\t\ \c\o\n\f\i\g\ \-\-\g\e\t\ \c\o\d\e\s\p\a\c\e\s\-\t\h\e\m\e\.\h\i\d\e\-\s\t\a\t\u\s\ \2\>\/\d\e\v\/\n\u\l\l\)\"\ \!\=\ \1\ \]\;\ \t\h\e\n\ \\\
+\ \ \ \ \ \ \ \ \ \ \ \ \e\x\p\o\r\t\ \B\R\A\N\C\H\=\"\$\(\g\i\t\ \-\-\n\o\-\o\p\t\i\o\n\a\l\-\l\o\c\k\s\ \s\y\m\b\o\l\i\c\-\r\e\f\ \-\-\s\h\o\r\t\ \H\E\A\D\ \2\>\/\d\e\v\/\n\u\l\l\ \|\|\ \g\i\t\ \-\-\n\o\-\o\p\t\i\o\n\a\l\-\l\o\c\k\s\ \r\e\v\-\p\a\r\s\e\ \-\-\s\h\o\r\t\ \H\E\A\D\ \2\>\/\d\e\v\/\n\u\l\l\)\"\;\ \\\
+\ \ \ \ \ \ \ \ \ \ \ \ \i\f\ \[\ \"\$\{\B\R\A\N\C\H\:\-\}\"\ \!\=\ \"\"\ \]\;\ \t\h\e\n\ \\\
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \e\c\h\o\ \-\n\ \"\\\[\\\0\3\3\[\0\;\3\6\m\\\]\(\\\[\\\0\3\3\[\1\;\3\1\m\\\]\$\{\B\R\A\N\C\H\:\-\}\"\ \\\
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\&\ \i\f\ \[\ \"\$\(\g\i\t\ \c\o\n\f\i\g\ \-\-\g\e\t\ \d\e\v\c\o\n\t\a\i\n\e\r\s\-\t\h\e\m\e\.\s\h\o\w\-\d\i\r\t\y\ \2\>\/\d\e\v\/\n\u\l\l\)\"\ \=\ \1\ \]\ \&\&\ \\\
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \g\i\t\ \-\-\n\o\-\o\p\t\i\o\n\a\l\-\l\o\c\k\s\ \l\s\-\f\i\l\e\s\ \-\-\e\r\r\o\r\-\u\n\m\a\t\c\h\ \-\m\ \-\-\d\i\r\e\c\t\o\r\y\ \-\-\n\o\-\e\m\p\t\y\-\d\i\r\e\c\t\o\r\y\ \-\o\ \-\-\e\x\c\l\u\d\e\-\s\t\a\n\d\a\r\d\ \"\:\/\*\"\ \>\ \/\d\e\v\/\n\u\l\l\ \2\>\&\1\;\ \t\h\e\n\ \\\
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \e\c\h\o\ \-\n\ \"\ \\\[\\\0\3\3\[\1\;\3\3\m\\\]\✗\"\;\ \\\
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \f\i\ \\\
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\&\ \e\c\h\o\ \-\n\ \"\\\[\\\0\3\3\[\0\;\3\6\m\\\]\)\ \"\;\ \\\
+\ \ \ \ \ \ \ \ \ \ \ \ \f\i\;\ \\\
+\ \ \ \ \ \ \ \ \f\i\`\\\[\\\0\3\3\[\0\m\\\]\$\ \\\[\\]\6\3\3\;\B\\\\] ]]
+++ [[ \[]633;F\]> \[]633;G\] == '' ]]
+++ [[ \[]633;F\]> \[]633;G\] != \\\[\\]\6\3\3\;\F\\\\]\>\ \\\[\\]\6\3\3\;\G\\\\] ]]
+++ __vsc_in_command_execution=0
+++ __vsc_update_env
+++ [[ 0 -gt 0 ]]
+++ export XIT=0
+++ XIT=0
+++ '[' '!' -z Freddy-GD ']'
+++ echo -n '[0;32m@Freddy-GD '
+++ '[' 0 -ne 0 ']'
+++ echo -n '[0m➜'
++++ git config --get devcontainers-theme.hide-status
+++ '[' '' '!=' 1 ']'
++++ git config --get codespaces-theme.hide-status
+++ '[' '' '!=' 1 ']'
++++ git --no-optional-locks symbolic-ref --short HEAD
+++ export BRANCH=main
+++ BRANCH=main
+++ '[' main '!=' '' ']'
+++ echo -n '[0;36m([1;31mmain'
++++ git config --get devcontainers-theme.show-dirty
+++ '[' '' = 1 ']'
+++ echo -n '[0;36m) '
+[?2004h]633;A[0;32m@Freddy-GD [0m➜ [1;34m/workspaces/Project-1 [0;36m([1;31mmain[0;36m) [0m$ ]633;B. ./f[KC[Kaws+ local cur prev words cword split
++ _init_completion -s
++ local exclude= flag outx errx inx OPTIND=1
++ getopts n:e:o:i:s flag -s
++ case $flag in
++ split=false
++ exclude+==
++ getopts n:e:o:i:s flag -s
++ COMPREPLY=()
++ local 'redir=@(?([0-9])<|?([0-9&])>?(>)|>&)'
++ _get_comp_words_by_ref -n '=<>&' cur prev words cword
++ local exclude flag i OPTIND=1
++ words=()
++ local cur cword words
++ upargs=()
++ upvars=()
++ local upargs upvars vcur vcword vprev vwords
++ getopts c:i:n:p:w: flag -n '=<>&' cur prev words cword
++ case $flag in
++ exclude='=<>&'
++ getopts c:i:n:p:w: flag -n '=<>&' cur prev words cword
++ [[ 6 -ge 3 ]]
++ case ${!OPTIND} in
++ vcur=cur
++ (( OPTIND += 1 ))
++ [[ 6 -ge 4 ]]
++ case ${!OPTIND} in
++ vprev=prev
++ (( OPTIND += 1 ))
++ [[ 6 -ge 5 ]]
++ case ${!OPTIND} in
++ vwords=words
++ (( OPTIND += 1 ))
++ [[ 6 -ge 6 ]]
++ case ${!OPTIND} in
++ vcword=cword
++ (( OPTIND += 1 ))
++ [[ 6 -ge 7 ]]
++ __get_cword_at_cursor_by_ref '=<>&' words cword cur
++ words=()
++ local cword words
++ __reassemble_comp_words_by_ref '=<>&' words cword
++ local exclude i j line ref
++ [[ -n =<>& ]]
++ exclude='[=<>&]'
++ printf -v cword %s 1
++ [[ -v exclude ]]
++ line='. ./aws'
++ (( i = 0, j = 0 ))
++ (( i < 2 ))
++ [[ 0 -gt 0 ]]
++ ref='words[0]'
++ printf -v 'words[0]' %s .
++ line=' ./aws'
++ (( i == COMP_CWORD ))
++ (( i++, j++ ))
++ (( i < 2 ))
++ [[ 1 -gt 0 ]]
++ [[ ./aws == +([=<>&]) ]]
++ ref='words[1]'
++ printf -v 'words[1]' %s ./aws
++ line=
++ (( i == COMP_CWORD ))
++ printf -v cword %s 1
++ (( i++, j++ ))
++ (( i < 2 ))
++ (( i == COMP_CWORD ))
++ local i cur= index=7 'lead=. ./aws'
++ [[ 7 -gt 0 ]]
++ [[ -n . ./aws ]]
++ [[ -n ../aws ]]
++ cur='. ./aws'
++ (( i = 0 ))
++ (( i <= cword ))
++ [[ 7 -ge 1 ]]
++ [[ . != \. ]]
++ (( i < cword ))
++ local old_size=7
++ cur=' ./aws'
++ local new_size=6
++ (( index -= old_size - new_size ))
++ (( ++i ))
++ (( i <= cword ))
++ [[ 6 -ge 5 ]]
++ [[  ./aw != \.\/\a\w\s ]]
++ cur=./aws
++ (( index > 0 ))
++ (( index-- ))
++ [[ 5 -ge 5 ]]
++ [[ ./aws != \.\/\a\w\s ]]
++ (( i < cword ))
++ (( ++i ))
++ (( i <= cword ))
++ [[ -n ./aws ]]
++ [[ ! -n ./aws ]]
++ (( index < 0 ))
++ local words cword cur
++ _upvars -a2 words . ./aws -v cword 1 -v cur ./aws
++ (( 10 ))
++ (( 10 ))
++ case $1 in
++ [[ -n 2 ]]
++ printf %d 2
++ [[ -n words ]]
++ unset -v words
++ eval 'words=("${@:3:2}")'
+++ words=("${@:3:2}")
++ shift 4
++ (( 6 ))
++ case $1 in
++ [[ -n cword ]]
++ unset -v cword
++ eval 'cword="$3"'
+++ cword=1
++ shift 3
++ (( 3 ))
++ case $1 in
++ [[ -n cur ]]
++ unset -v cur
++ eval 'cur="$3"'
+++ cur=./aws
++ shift 3
++ (( 0 ))
++ [[ -v vcur ]]
++ upvars+=("$vcur")
++ upargs+=(-v $vcur "$cur")
++ [[ -v vcword ]]
++ upvars+=("$vcword")
++ upargs+=(-v $vcword "$cword")
++ [[ -v vprev ]]
++ [[ 1 -ge 1 ]]
++ upvars+=("$vprev")
++ upargs+=(-v $vprev "${words[cword - 1]}")
++ [[ -v vwords ]]
++ upvars+=("$vwords")
++ upargs+=(-a${#words[@]} $vwords ${words+"${words[@]}"})
++ (( 4 ))
++ local cur cword prev words
++ _upvars -v cur ./aws -v cword 1 -v prev . -a2 words . ./aws
++ (( 13 ))
++ (( 13 ))
++ case $1 in
++ [[ -n cur ]]
++ unset -v cur
++ eval 'cur="$3"'
+++ cur=./aws
++ shift 3
++ (( 10 ))
++ case $1 in
++ [[ -n cword ]]
++ unset -v cword
++ eval 'cword="$3"'
+++ cword=1
++ shift 3
++ (( 7 ))
++ case $1 in
++ [[ -n prev ]]
++ unset -v prev
++ eval 'prev="$3"'
+++ prev=.
++ shift 3
++ (( 4 ))
++ case $1 in
++ [[ -n 2 ]]
++ printf %d 2
++ [[ -n words ]]
++ unset -v words
++ eval 'words=("${@:3:2}")'
+++ words=("${@:3:2}")
++ shift 4
++ (( 0 ))
++ _variables
++ [[ ./aws =~ ^(\$(\{[!#]?)?)([A-Za-z0-9_]*)$ ]]
++ [[ ./aws =~ ^(\$\{[#!]?)([A-Za-z0-9_]*)\[([^]]*)$ ]]
++ [[ ./aws =~ ^\$\{[#!]?[A-Za-z0-9_]*\[.*]$ ]]
++ return 1
++ [[ ./aws == @(?([0-9])<|?([0-9&])>?(>)|>&)* ]]
++ [[ . == @(?([0-9])<|?([0-9&])>?(>)|>&) ]]
++ local i skip
++ (( i = 1 ))
++ (( i < 2 ))
++ [[ ./aws == @(?([0-9])<|?([0-9&])>?(>)|>&)* ]]
++ (( i++ ))
++ (( 1 ))
++ (( i < 2 ))
++ (( cword <= 0 ))
++ prev=.
++ [[ -n false ]]
++ _split_longopt
++ [[ ./aws == --?*=* ]]
++ return 1
++ return 0
++ false
++ _filedir
++ local 'IFS=
+'
++ _tilde ./aws
++ local result=0
++ [[ ./aws == \~* ]]
++ return 0
++ local -a toks
++ local reset arg=
++ [[ '' == -d ]]
++ local quoted
++ _quote_readline_by_ref ./aws quoted
++ [[ ./aws == \'* ]]
++ printf -v quoted %q ./aws
++ [[ ./aws == \$* ]]
+[?2004l

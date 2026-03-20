@@ -1,0 +1,82 @@
++ echo '===== VERIFYING AWS INFRASTRUCTURE FOR PROJECT1 ====='
+===== VERIFYING AWS INFRASTRUCTURE FOR PROJECT1 =====
++ VPC_NAME=Project1-VPC
++ EC2_TAG=Project1-Private-Instance
++ BASTION_TAG=Project1-Bashion-Instance
++ ALB_NAME=Project1-ALB
++ EC2_SG_NAME=Project1-Web-SG
++ BASTION_SG_NAME=Project1-Bashion-SG
++ ALB_SG_NAME=Project1-ALB-SG
+++ aws ec2 describe-vpcs --filters Name=tag:Name,Values=Project1-VPC --query 'Vpcs[0].VpcId' --output text
++ VPC_ID=vpc-0b36e937f9fc034ea
++ echo 'VPC ID: vpc-0b36e937f9fc034ea'
+VPC ID: vpc-0b36e937f9fc034ea
++ echo 'Public Subnets:'
+Public Subnets:
++ aws ec2 describe-subnets --filters Name=vpc-id,Values=vpc-0b36e937f9fc034ea Name=tag:Name,Values=Project1-Public-Subnet --query 'Subnets[].SubnetId' --output table
+------------------------------
+|       DescribeSubnets      |
++----------------------------+
+|  subnet-0527fa5498d8a4e6b  |
++----------------------------+
++ echo 'Private Subnets:'
+Private Subnets:
++ aws ec2 describe-subnets --filters Name=vpc-id,Values=vpc-0b36e937f9fc034ea 'Name=tag:Name,Values=Project1-Private-Subnet*' --query 'Subnets[].SubnetId' --output table
+------------------------------
+|       DescribeSubnets      |
++----------------------------+
+|  subnet-00743bb2647b9789c  |
+|  subnet-09d105036b4709114  |
++----------------------------+
++ echo 'Security Groups:'
+Security Groups:
++ aws ec2 describe-security-groups --filters Name=vpc-id,Values=vpc-0b36e937f9fc034ea --query 'SecurityGroups[*].[GroupName,GroupId]' --output table
+-------------------------------------------------
+|            DescribeSecurityGroups             |
++----------------------+------------------------+
+|  Project1-Web-SG     |  sg-007b45eca4e31f64a  |
+|  Project1-ALB-SG     |  sg-01c5a5452d2aab4b7  |
+|  Project1-Bashion-SG |  sg-05c218beb8f9db8b5  |
+|  default             |  sg-07b21505afe4cbaa7  |
++----------------------+------------------------+
++ echo 'Private EC2 Instances:'
+Private EC2 Instances:
++ aws ec2 describe-instances --filters 'Name=tag:Name,Values=Project1-Private-Instance*' --query 'Reservations[*].Instances[*].[InstanceId,PrivateIpAddress,State.Name,SubnetId]' --output table
+--------------------------------------------------------------------------------
+|                               DescribeInstances                              |
++----------------------+---------------+----------+----------------------------+
+|  i-05272683a247a5bba |  172.1.18.112 |  running |  subnet-09d105036b4709114  |
+|  i-0aa15c1c36778877e |  172.1.49.175 |  running |  subnet-00743bb2647b9789c  |
++----------------------+---------------+----------+----------------------------+
++ echo 'Bastion Host:'
+Bastion Host:
++ aws ec2 describe-instances --filters Name=tag:Name,Values=Project1-Bashion-Instance --query 'Reservations[*].Instances[*].[InstanceId,PublicIpAddress,State.Name]' --output table
+++ aws ec2 describe-instances --filters Name=tag:Name,Values=Project1-Bashion-Instance --query 'Reservations[0].Instances[0].PublicIpAddress' --output text
++ BASTION_IP=None
++ echo 'Bastion Public IP: None'
+Bastion Public IP: None
+++ aws elbv2 describe-load-balancers --names Project1-ALB --query 'LoadBalancers[0].DNSName' --output text
++ ALB_DNS=Project1-ALB-1670748180.us-east-2.elb.amazonaws.com
++ echo 'ALB DNS: Project1-ALB-1670748180.us-east-2.elb.amazonaws.com'
+ALB DNS: Project1-ALB-1670748180.us-east-2.elb.amazonaws.com
+++ curl -s -o /dev/null -w '%{http_code}' http://Project1-ALB-1670748180.us-east-2.elb.amazonaws.com
++ HTTP_STATUS=200
++ echo 'HTTP status from ALB: 200'
+HTTP status from ALB: 200
++ '[' 200 == 200 ']'
++ echo '✅ ALB is responding correctly'
+✅ ALB is responding correctly
++ echo 'Network ACLs:'
+Network ACLs:
++ aws ec2 describe-network-acls --filters Name=vpc-id,Values=vpc-0b36e937f9fc034ea --query 'NetworkAcls[*].[NetworkAclId,IsDefault]' --output table
+------------------------------------
+|        DescribeNetworkAcls       |
++------------------------+---------+
+|  acl-09917e114614c17de |  True   |
+|  acl-0f2420e99104acb26 |  False  |
++------------------------+---------+
++ echo 'Route Tables:'
+Route Tables:
++ aws ec2 describe-route-tables --filters Name=vpc-id,Values=vpc-0b36e937f9fc034ea --query 'RouteTables[*].[RouteTableId,Routes]' --output table
+
+list index out of range
