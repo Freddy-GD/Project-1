@@ -1,46 +1,67 @@
 #!/usr/bin/env bash
 #set -euo pipefail
 
+
+LOG_FILE="create_ec2_$(date +%Y%m%d_%H%M%S).log"
+
+# Log everything (stdout + stderr) to file AND terminal
+exec > >(tee -a "$LOG_FILE") 2>&1
+
+# Exit immediately if a command fails
+set -e
+
+# Print each command before execution (debug mode)
+set -x
+
+echo "===== SCRIPT STARTED at $(date) ====="
+
 Project_Tag="Project1"
 VPC_ID=$(aws ec2 describe-vpcs --filters "Name=tag:Name,Values=Project1-VPC" --query "Vpcs[0].VpcId" --output text)
-# PUBLIC_SUBNET_ID=$(aws ec2 describe-subnets --filters "Name=tag:Name,Values=Project1-Public-Subnet" --query "Subnets[0].SubnetId" --output text)
+PUBLIC_SUBNET_ID=$(aws ec2 describe-subnets --filters "Name=tag:Name,Values=Project1-Public-Subnet" --query "Subnets[0].SubnetId" --output text)
 # SEC_PUBLIC_SUBNET_ID=$(aws ec2 describe-subnets --filters "Name=tag:Name,Values=Project1-Public-Subnet-2" --query "Subnets[0].SubnetId" --output text)
 First_Private_Subnet=$(aws ec2 describe-subnets --filters "Name=tag:Name,Values=Project1-Private-Subnet" --query 'Subnets[0].SubnetId' --output text)
 Second_Private_Subnet=$(aws ec2 describe-subnets --filters "Name=tag:Name,Values=Project1-Private-Subnet-2" --query 'Subnets[0].SubnetId' --output text)
 SG_ID=$(aws ec2 describe-security-groups --filters "Name=tag:Name,Values=Project1-Web-SG" --query 'SecurityGroups[0].GroupId' --output text)
+SG_Bashion_ID=$(aws ec2 describe-security-groups --filters "Name=tag:Name,Values=Project1-Bashion-SG" --query 'SecurityGroups[0].GroupId' --output text)
+
 
 # Get the Instance ID of the EC2 instance
-AMI_ID=$(aws ec2 describe-images --owners amazon --filters "Name=name,Values=amzn2-ami-hvm-*-x86_64-gp2" --query "Images[0].ImageId" --output text)
+AMI_ID=$(aws ec2 describe-images --owners amazon --filters "Name=name,Values=amzn2-ami-hvm-*-x86_64-gp2" --query "sort_by(Images, &CreationDate)[-1].ImageId" --output text)
 
 echo "Using AMI ID: $AMI_ID for EC2 instance creation"
 
 # Create Key Pair
-aws ec2 create-key-pair --key-name "Project1-Key" --query "KeyMaterial" --output text > Project1-Key.pem
-chmod 400 Project1-Key.pem
-echo "Created Key Pair and saved to Project1-Key.pem"
+if [ ! -f "Project1-Key.pem" ]; then
+  aws ec2 create-key-pair \
+    --key-name "Project1-Key" \
+    --query "KeyMaterial" \
+    --output text > Project1-Key.pem
 
+  chmod  400 Project1-Key.pem
+  echo "Created Key Pair and saved to Project1-Key.pem"
+fi 
 # Create EC2 Instance
-# INSTANCE1_ID=$(aws ec2 run-instances \
-#     --image-id $AMI_ID \
-#     --instance-type t3.micro \
-#     --key-name "Project1-Key" \
-#     --security-group-ids $SG_ID \
-#     --subnet-id $PUBLIC_SUBNET_ID \
-#     --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=Project1-Public-Instance-1}]" \
-#     --associate-public-ip-address \
-#     --user-data "$(cat <<'EOF'
-# #!/bin/bash
-# yum update -y
-# yum install -y httpd
-# systemctl start httpd
-# systemctl enable httpd 
-# echo "Hello from Project1 Web Server!" > /var/www/html/index.html
-# EOF
-#     )" \
-#     --query 'Instances[0].InstanceId' --output text)
+INSTANCE1_ID=$(aws ec2 run-instances \
+    --image-id $AMI_ID \
+    --instance-type t3.micro \
+    --key-name "Project1-Key" \
+    --security-group-ids $SG_Bashion_ID \
+    --subnet-id $PUBLIC_SUBNET_ID \
+    --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=Project1-Bashion-Instance-1}]" \
+    --associate-public-ip-address \
+    --user-data "$(cat <<'EOF'
+#!/bin/bash
+yum update -y
+yum install -y httpd
+systemctl start httpd
+systemctl enable httpd 
+echo "Hello from Project1 Web Server!" > /var/www/html/index.html
+EOF
+    )" \
+    --query 'Instances[0].InstanceId' --output text)
 
 
-# echo "Created an EC2 Instance in the first subnet with ID: $INSTANCE1_ID"
+echo "Created an EC2 Bashion Instance in the first subnet with ID: $INSTANCE1_ID"
 
 # export INSTANCE1_ID
 

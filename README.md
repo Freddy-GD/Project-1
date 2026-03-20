@@ -1,4 +1,84 @@
-#Project 1
+# AWS Multi-AZ Production Network & Automation
+
+This project demonstrates a production-grade AWS network architecture deployed across multiple Availability Zones, with automation using Bash scripts and AWS CLI. It includes lessons learned from troubleshooting real-world networking issues and automates resource creation, configuration, and validation.
+
+---
+
+## Features
+
+- Multi-AZ deployment with Public and Private subnets
+- Internet-facing Application Load Balancer
+- Bastion host for secure SSH access
+- NAT Gateway for outbound connectivity
+- CLI automation for creating VPC, subnets, route tables, security groups, NACLs, ALB, EC2 instances
+- Infrastructure validation script to verify deployments and test ALB health
+- Resource tagging for organization and clarity
+
+---
+
+## Architecture Diagram
+
+
+*Figure 1: Multi-AZ AWS architecture showing public and private subnets, Bastion host, NAT Gateway, and Internet-facing ALB.*
+
+---
+
+## Architecture Components
+
+| Component                  | Purpose |
+|----------------------------|---------|
+| VPC                        | Isolates network (CIDR: 172.1.0.0/16) |
+| AZ-A & AZ-B                | Multi-AZ redundancy for high availability |
+| Public Subnet              | Hosts ALB and Bastion host |
+| Private Subnet             | Hosts EC2 application servers (no public IP) |
+| Bastion Host               | Secure SSH access to private EC2 instances |
+| NAT Gateway                | Allows outbound internet access from private subnets |
+| Internet Gateway           | Provides ingress and egress to the Internet |
+| Application Load Balancer  | Distributes traffic across private EC2 instances |
+
+---
+
+## Traffic Flow
+
+1. Users access the ALB through the Internet Gateway.
+2. ALB distributes traffic across private EC2 instances in AZ-A and AZ-B.
+3. Private EC2 instances use the NAT Gateway for outbound internet traffic.
+4. SSH access to private EC2 instances is only possible via the Bastion host.
+
+---
+
+## Automation Scripts
+
+All automation scripts are located in the `aws-network-automation` directory. They provision the network components in the correct order.
+
+| Script                          | Purpose |
+|---------------------------------|---------|
+| `Create_vpc.sh`                  | Creates VPC with DNS hostnames enabled |
+| `Create_sec_subnet_diff_az.sh`  | Creates secondary public and private subnets across AZs |
+| `Create_SGs.sh`                  | Creates security groups for Bastion, EC2, ALB |
+| `Create_NACL.sh`                 | Creates and attaches custom Network ACL |
+| `Create_nat_gateway.sh`          | Creates NAT Gateway and updates route tables |
+| `Create_ec2.sh`                  | Launches private EC2 instances |
+| `Create_alb.sh`                  | Creates and configures Application Load Balancer |
+| `Verify_infra.sh`                | Validates infrastructure by describing resources and testing ALB returns HTTP 200 |
+
+### How to Run
+
+Run the scripts sequentially to provision the infrastructure:
+
+```bash
+source Create_vpc.sh
+source Create_sec_subnet_diff_az.sh
+source Create_SGs.sh
+source Create_NACL.sh
+source Create_nat_gateway.sh
+source Create_ec2.sh
+source Create_alb.sh
+source Verify_infra.sh
+````
+
+---
+
 
 ## Troubleshooting & Lessons Learned
 
@@ -99,4 +179,16 @@ This issue reinforced the importance of:
 - Inspecting raw API responses during automation
 - Writing resilient CLI scripts
 - Avoiding assumptions about ordering in distributed systems
+
+---
+
+## Key Engineering Learnings
+
+* Multi-AZ architecture improves availability and fault tolerance
+* Public vs Private subnet separation is critical for security
+* Bastion host pattern ensures secure SSH access
+* NAT Gateway allows controlled outbound internet access
+* Internet-facing ALB must be deployed in public subnets
+* CLI automation requires logging, idempotent scripts, and deterministic queries
+* Troubleshooting reinforces production-ready cloud engineering practices
 
